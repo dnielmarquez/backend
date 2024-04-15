@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPPLIER
+  COMPANY_PIC
+  ADMIN
+}
+
+enum ProductOptions {
+  VAULT
+  COVER
+}
+
+enum StatusOptions {
+  ReadyForReview
+  ReadyToAcceptance
+  Replace
+  Repair
+  Accepted
+  AcceptAsIs
+  Rejected
+}
+
+enum ProductProcesses {
+  MACHINING
+  COATING
+}
+
+model User {
+  id               String        @id @default(uuid())
+  name             String?
+  supplierName     String?
+  employeeName     String?
+  companyName      String?
+  position         String
+  email            String        @unique
+  contactNumber    String
+  password         String
+  resetToken       String?       @unique
+  resetTokenExpiry DateTime?
+  verified         Boolean       @default(false) // Field to indicate if the user account is verified
+  role             UserRole
+  supplier         Supplier?      @relation(fields: [supplierId], references: [id])
+  supplierId       String?
+}
+
+
+model Request {
+  id                  String          @id @default(uuid())
+  createdByUserId     String
+  productName         ProductOptions  // Enum for product name (VAULT, COVER)
+  productRequirements Json          // Text field to capture specific product requirements
+  process             Json
+  quantity            Int?
+  assignedSuppliers   Supplier[]     
+  assignmentDate      DateTime        // Date when the supplier is assigned
+  dueDate             DateTime        // Due date for the supplier to upload data
+  createdAt           DateTime        @default(now()) // Timestamp for when the request was created
+  updatedAt           DateTime        @updatedAt // Timestamp for when the request was last updated
+  status              StatusOptions?
+  reviewedMachining   Json?
+  reviewedCoating     Json?
+  prevReviewedMachining   Json?
+  prevReviewedCoating     Json?
+  systemReview        Json?
+  supplierThatChecked String?
+  acceptanceRemarks   String?
+  acceptedBy          String?
+  acceptedByPosition  String?
+  dateAccepted        DateTime?
+  dateChecked         DateTime?
+  machiningPassed     Boolean        @default(false)
+  coatingPassed       Boolean        @default(false)
+  blockchainTx        String?
+  fileOnchainHash     String?
+}
+
+model Supplier {
+  id                  String        @id @default(uuid())
+  supplierName        String        @unique
+  assignedEmployees   User[]
+  assignedRequests    Request[]
+}

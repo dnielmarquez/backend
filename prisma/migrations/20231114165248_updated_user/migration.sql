@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `employeeName` VARCHAR(191) NULL,
+    ADD COLUMN `supplierName` VARCHAR(191) NULL,
+    MODIFY `name` VARCHAR(191) NULL,
+    MODIFY `role` ENUM('SUPPLIER', 'COMPANY_PIC', 'ADMIN') NOT NULL;
