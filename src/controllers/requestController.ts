@@ -40,7 +40,7 @@ export const RequestController = {
       // Here you can implement logic to store URLs in your database
       // For simplicity, we are just returning the file paths
       const fileUrls = files.map((file) => `/uploads/${file.filename}`);
-      console.log("upload5");
+      console.log("upload5", fileUrls);
       res.json({ message: "Files uploaded successfully.", urls: fileUrls });
     } catch (error: any) {
       console.log("upload6");
