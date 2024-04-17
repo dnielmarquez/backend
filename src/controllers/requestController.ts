@@ -29,17 +29,21 @@ export const RequestController = {
   // Add this function in your RequestController
   uploadImages: async (req: Request, res: Response) => {
     try {
+      console.log("upload1");
       const files = req.files as Express.Multer.File[];
-
+      console.log("upload2");
       if (!files || files.length === 0) {
+        console.log("upload3");
         return res.status(400).json({ message: "No files uploaded." });
       }
-
+      console.log("upload4");
       // Here you can implement logic to store URLs in your database
       // For simplicity, we are just returning the file paths
       const fileUrls = files.map((file) => `/uploads/${file.filename}`);
+      console.log("upload5");
       res.json({ message: "Files uploaded successfully.", urls: fileUrls });
     } catch (error: any) {
+      console.log("upload6");
       res
         .status(500)
         .json({ message: "Error uploading files", error: error.message });
@@ -232,7 +236,7 @@ export const RequestController = {
                 `
                 <p>Hey!, you just received a new order request.</p>
                 <p>Assignment Date: ${formattedAssignmentDate} - Due Date: ${formattedDueDate}.</p>
-                <p>Please check the order in: <a href="http://localhost:3000/supplier/supplier-checklist/${newRequest.id}">here</a>.</p>
+                <p>Please check the order in: <a href="https://mputmblkchain.online/supplier/supplier-checklist/${newRequest.id}">here</a>.</p>
               `,
                 "New Order Request For You!"
               );
@@ -330,7 +334,7 @@ export const RequestController = {
             company.email,
             `
       <p>Oops, your order review was rejected, please enter the app and check.</p>
-      <p>Check order in <a href="http://localhost:3000/company/requestSummary/${id}">here</a>.</p>
+      <p>Check order in <a href="https://mputmblkchain.online/company/requestSummary/${id}">here</a>.</p>
     `,
             "New Order Rejected"
           );
@@ -432,7 +436,7 @@ export const RequestController = {
                 `
                   <p>Attention!, your order has a new Due Date, please enter the app and check.</p>
                   <p>New Due Date: ${formattedDueDate}.</p>
-                  <p>Check order in <a href="http://localhost:3000/supplier/supplier-checklist/${id}">here</a>.</p>
+                  <p>Check order in <a href="https://mputmblkchain.online/supplier/supplier-checklist/${id}">here</a>.</p>
                 `,
                 "New Due Date for order"
               );
