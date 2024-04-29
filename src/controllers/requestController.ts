@@ -287,6 +287,8 @@ export const RequestController = {
       if (updatedRequest.reviewedMachining) {
         machiningData = updatedRequest.reviewedMachining as any[];
         machiningValidation = validateMachining(machiningData, productReq);
+        console.log("MANDANDO");
+        console.log("machiningValidation",machiningValidation);
         dataToSend.reviewedMachining = machiningValidation;
       }
       if (updatedRequest.reviewedCoating) {
@@ -363,6 +365,7 @@ export const RequestController = {
   },
   updateRequest: async (req: Request, res: Response) => {
     try {
+      console.log("init Update");
       const id = req.params.id;
       const { assignedSupplierIds, ...updateData } = req.body;
 
@@ -379,19 +382,25 @@ export const RequestController = {
           },
         };
       }
+      console.log("request assigned suppliers set");
       if (
         updateData.status &&
         (updateData.status == "AcceptAsIs" || updateData.status == "Accepted")
       ) {
+        console.log("es acceptAsIs o Accepted");
         try {
           const token = req.headers.authorization?.split(" ")[1];
           if (!token) {
             return res.status(401).json({ message: "No token provided" });
           }
+          console.log("revisamos si llego token");
+
           const decoded = AuthService.verifyToken(token);
           const company = await prisma.user.findUnique({
             where: { id: decoded.id },
           });
+          console.log("token valido");
+
           updatePayload.acceptedBy = company?.companyName;
           updatePayload.acceptedByPosition = company?.position;
           updatePayload.dateAccepted = new Date().toISOString();
@@ -405,6 +414,8 @@ export const RequestController = {
         updateData.status &&
         (updateData.status == "Repair" || updateData.status == "Replace")
       ) {
+        console.log("era repair o replace");
+
         const requestLoaded = await prisma.request.findUnique({
           where: { id },
         });
@@ -420,6 +431,8 @@ export const RequestController = {
               updatePayload.reviewedCoating = "";
             }
           }
+          console.log("revisado passed");
+
           if (requestLoaded.supplierThatChecked) {
             const userSup = await prisma.user.findUnique({
               where: { id: requestLoaded.supplierThatChecked },
@@ -431,6 +444,8 @@ export const RequestController = {
                 month: "long",
                 day: "numeric",
               });
+              console.log("vamos a mandar correo");
+
               EmailService.sendEmail(
                 userSup.email,
                 `
@@ -440,6 +455,8 @@ export const RequestController = {
                 `,
                 "New Due Date for order"
               );
+              console.log("enviado?");
+
             }
           }
         }
@@ -450,6 +467,7 @@ export const RequestController = {
         data: updatePayload,
         include: { assignedSuppliers: true }, // Include related records
       });
+      console.log("actualizamos");
 
       res.json(updatedRequest);
     } catch (error: any) {
